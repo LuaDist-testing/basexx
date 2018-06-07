@@ -1,5 +1,3 @@
--- This file was automatically generated for the LuaDist project.
-
 package = "basexx"
 version = "0.1.1-1"
 description = {
@@ -11,17 +9,11 @@ description = {
 dependencies = {
    "lua >= 5.1"
 }
--- LuaDist source
 source = {
-  tag = "0.1.1-1",
-  url = "git://github.com/LuaDist-testing/basexx.git"
+   url = "https://github.com/aiq/basexx/archive/v0.1.1.tar.gz",
+   md5 = "6481b5f980c0da1248821273271290be",
+   dir = "basexx-0.1.1"
 }
--- Original source
--- source = {
---    url = "https://github.com/aiq/basexx/archive/v0.1.1.tar.gz",
---    md5 = "6481b5f980c0da1248821273271290be",
---    dir = "basexx-0.1.1"
--- }
 build = {
    type = 'builtin',
    modules = {
