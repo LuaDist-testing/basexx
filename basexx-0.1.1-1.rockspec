@@ -1,7 +1,7 @@
 -- This file was automatically generated for the LuaDist project.
 
 package = "basexx"
-version = "0.1.0-1"
+version = "0.1.1-1"
 description = {
    summary  = "A base2, base32 and base64 library for Lua",
    detailed = "A library which provides base2(bitfield), base32(crock ford/rfc 3548), base64 decoding and encoding.",
@@ -13,14 +13,14 @@ dependencies = {
 }
 -- LuaDist source
 source = {
-  tag = "0.1.0-1",
+  tag = "0.1.1-1",
   url = "git://github.com/LuaDist-testing/basexx.git"
 }
 -- Original source
 -- source = {
---    url = "https://github.com/aiq/basexx/archive/v0.1.0.tar.gz",
---    md5 = "66570a1e354ce0c919192c895a1ee8bb",
---    dir = "basexx-0.1.0"
+--    url = "https://github.com/aiq/basexx/archive/v0.1.1.tar.gz",
+--    md5 = "6481b5f980c0da1248821273271290be",
+--    dir = "basexx-0.1.1"
 -- }
 build = {
    type = 'builtin',
