@@ -1,7 +1,7 @@
 -- This file was automatically generated for the LuaDist project.
 
 package = "basexx"
-version = "0.2.0-1"
+version = "0.3.0-1"
 
 description = {
    summary  = "A base2, base16, base32, base64 and base85 library for Lua",
@@ -12,14 +12,14 @@ description = {
 
 -- LuaDist source
 source = {
-  tag = "0.2.0-1",
+  tag = "0.3.0-1",
   url = "git://github.com/LuaDist-testing/basexx.git"
 }
 -- Original source
 -- source = {
---    url = "https://github.com/aiq/basexx/archive/v0.2.0.tar.gz",
---    md5 = "2c40dd08dbd39310d312756f8eda178b",
---    dir = "basexx-0.2.0"
+--    url = "https://github.com/aiq/basexx/archive/v0.3.0.tar.gz",
+--    md5 = "32277d2c4564dabd0c45c9c67ec1e811",
+--    dir = "basexx-0.3.0"
 -- }
 
 dependencies = {

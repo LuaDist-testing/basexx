@@ -35,6 +35,19 @@ local function number_to_bit( num, length )
    return string.reverse( table.concat( bits ) )
 end
 
+local function ignore_set( str, set )
+   if set then
+      str = str:gsub( "["..set.."]", "" )
+   end
+   return str
+end
+
+local function pure_from_bit( str )
+   return ( str:gsub( '........', function ( cc )
+               return string.char( tonumber( cc, 2 ) )
+            end ) )
+end
+
 --------------------------------------------------------------------------------
 
 local basexx = {}
@@ -45,12 +58,14 @@ local basexx = {}
 
 local bitMap = { o = "0", i = "1", l = "1" }
 
-function basexx.from_bit( str )
+function basexx.from_bit( str, ignore )
+   str = ignore_set( str, ignore )
    str = string.lower( str )
    str = str:gsub( '[ilo]', function( c ) return bitMap[ c ] end )
-   return ( str:gsub( '........', function ( cc )
-               return string.char( tonumber( cc, 2 ) )
-            end ) )
+   local wrong = str:match( "[^01]" )
+   if wrong then return nil, wrong end
+
+   return pure_from_bit( str )
 end
 
 function basexx.to_bit( str )
@@ -69,7 +84,11 @@ end
 -- base16(hex) decode and encode function
 --------------------------------------------------------------------------------
 
-function basexx.from_hex( str )
+function basexx.from_hex( str, ignore )
+   str = ignore_set( str, ignore )
+   local wrong = str:match( "[^%x]" )
+   if wrong then return nil, wrong end
+
    return ( str:gsub( '..', function ( cc )
                return string.char( tonumber( cc, 16 ) )
             end ) )
@@ -90,14 +109,17 @@ local function from_basexx( str, alphabet, bits )
    for i = 1, #str do
       local c = string.sub( str, i, i )
       if c ~= '=' then
-         local index = string.find( alphabet, c )
+         local index = string.find( alphabet, c, 1, true )
+         if not index or c == "$" then
+            return nil, c
+         end
          table.insert( result, number_to_bit( index - 1, bits ) )
       end
    end
 
    local value = table.concat( result )
    local pad = #value % 8
-   return basexx.from_bit( string.sub( value, 1, #value - pad ) )
+   return pure_from_bit( string.sub( value, 1, #value - pad ) )
 end
 
 local function to_basexx( str, alphabet, bits, pad )
@@ -124,7 +146,8 @@ end
 local base32Alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567"
 local base32PadMap = { "", "======", "====", "===", "=" }
 
-function basexx.from_base32( str )
+function basexx.from_base32( str, ignore )
+   str = ignore_set( str, ignore )
    return from_basexx( string.upper( str ), base32Alphabet, 5 )
 end
 
@@ -139,7 +162,8 @@ end
 local crockfordAlphabet = "0123456789ABCDEFGHJKMNPQRSTVWXYZ"
 local crockfordMap = { O = "0", I = "1", L = "1" }
 
-function basexx.from_crockford( str )
+function basexx.from_crockford( str, ignore )
+   str = ignore_set( str, ignore )
    str = string.upper( str )
    str = str:gsub( '[ILOU]', function( c ) return crockfordMap[ c ] end )
    return from_basexx( str, crockfordAlphabet, 5 )
@@ -158,7 +182,8 @@ local base64Alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"..
                        "0123456789+/"
 local base64PadMap = { "", "==", "=" }
  
-function basexx.from_base64( str )
+function basexx.from_base64( str, ignore )
+   str = ignore_set( str, ignore )
    return from_basexx( str, base64Alphabet, 6 )
 end
 
@@ -174,7 +199,8 @@ local url64Alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"..
                       "abcdefghijklmnopqrstuvwxyz"..
                       "0123456789-_"
  
-function basexx.from_url64( str )
+function basexx.from_url64( str, ignore )
+   str = ignore_set( str, ignore )
    return from_basexx( str, url64Alphabet, 6 )
 end
 
@@ -199,15 +225,16 @@ local z85Decoder = { 0x00, 0x44, 0x00, 0x54, 0x53, 0x52, 0x48, 0x00,
                      0x19, 0x1A, 0x1B, 0x1C, 0x1D, 0x1E, 0x1F, 0x20, 
                      0x21, 0x22, 0x23, 0x4F, 0x00, 0x50, 0x00, 0x00 }
 
-function basexx.from_z85( str )
-   if #str % 5 ~= 0 then return nil end
+function basexx.from_z85( str, ignore )
+   str = ignore_set( str, ignore )
+   if ( #str % 5 ) ~= 0 then return nil, #str % 5 end
 
    local result = {}
 
    local value = 0
    for i = 1, #str do
       local index = string.byte( str, i ) - 31
-      if index < 1 or index >= #z85Decoder then return nil end
+      if index < 1 or index >= #z85Decoder then return nil, index end
       value = ( value * 85 ) + z85Decoder[ index ]
       if ( i % 5 ) == 0 then
          local divisor = 256 * 256 * 256
@@ -229,7 +256,7 @@ local z85Encoder = "0123456789"..
                    ".-:+=^!/*?&<>()[]{}@%$#"
 
 function basexx.to_z85( str )
-   if ( #str % 4 ) ~= 0 then return nil end
+   if ( #str % 4 ) ~= 0 then return nil, #str, 4 end
 
    local result = {}
 

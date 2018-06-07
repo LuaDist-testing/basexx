@@ -58,4 +58,14 @@ describe( "should handle base64 strings", function()
                       basexx.from_base64( "YW55IGNhcm5hbCBwbGVhc3Vy" ) )
    end)
 
+   it( "should allow to ignore characters in a base64 string", function()
+      assert.is.same( "Man", basexx.from_base64( "TW-Fu", "-" ) )
+   end)
+
+   it( "should handle wrong characters without a crash", function()
+      local res, err = basexx.from_base64( "TW`Fu" )
+      assert.is.falsy( res )
+      assert.is.same( "`", err )
+   end)
+
 end)
